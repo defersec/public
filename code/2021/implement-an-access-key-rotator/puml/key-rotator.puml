@@ -1,0 +1,79 @@
+folder Interfaces {
+
+        interface KeyManager {
+                + ListAccessKeys()
+                + CreateNewAccessKey()
+                + DeleteAccessKey()
+        }
+
+        interface SecretsStore {
+                + CreateSecret()
+                + UpdateSecret()
+                + DeleteSecret()
+        }
+        interface ConfigStore {
+                + GetValue(key string) string
+        }
+}
+
+folder Entities {
+        class AccessKey{
+                + ID
+                + Secret
+        }
+}
+
+
+folder "github.com/aws/aws-sdk-go-v2" {
+        interface AWSIAM {
+                + ListAccessKeys()
+                + CreateNewAccessKey()
+                + DeleteAccessKey()
+        }
+        interface AWSSSM {
+                + GetParameter()
+        }
+}
+
+folder "cloud.google.com/go" {
+        interface GCPIAM {
+                + ListAccessKeys()
+                + CreateNewAccessKey()
+                + DeleteAccessKey()
+        }
+}
+
+folder "github.com/google/go-github" {
+        class GithubAPI
+}
+
+folder "Own code" {
+        class GCPKeyManager{
+                - client *gcp.Client
+        }
+        class AWSKeyManager{
+                - client *iam.Client
+        }
+        class AWSConfigStore {
+                - client *ssm.Client
+        }
+        class GithubSecretsStore
+        class GitlabSecretsStore
+}
+
+
+
+AWSKeyManager --> KeyManager
+AWSConfigStore --> ConfigStore
+GCPKeyManager --> KeyManager
+AWSKeyManager -up-> AWSIAM
+AWSConfigStore -up-> AWSSSM
+GCPKeyManager -up-> GCPIAM
+
+GithubSecretsStore -up-> GithubAPI :use
+
+GithubSecretsStore --> SecretsStore
+GitlabSecretsStore --> SecretsStore
+
+KeyManager -down-> AccessKey : use
+SecretsStore -down-> AccessKey : use

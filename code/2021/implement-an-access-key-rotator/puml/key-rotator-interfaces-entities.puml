@@ -1,0 +1,30 @@
+allow_mixing
+
+folder Interfaces {
+    interface KeyManager {
+        + ListAccessKeys()
+        + CreateNewAccessKey()
+        + DeleteAccessKey()
+    }
+
+    interface SecretsStore {
+        + CreateSecret()
+        + UpdateSecret()
+        + DeleteSecret()
+    }
+}
+
+folder Entities {
+    class AccessKey{
+        + ID
+        + Secret
+    }
+}
+
+usecase (Use case: Rotate\nkeys) as UC1
+usecase (Use case: Upload\nsecrets) as UC2
+KeyManager -up-> AccessKey : use
+SecretsStore -up-> AccessKey : use
+
+KeyManager <-- UC1 : use
+SecretsStore <-- UC2 : use
